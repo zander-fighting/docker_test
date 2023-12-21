@@ -1,0 +1,19 @@
+# Specify the version of the Compose file format
+version: '3'
+
+# Define the service for the centos7 container
+services:
+  centos7:
+    # The Docker image to use for the centos7 service
+    image: centos:7.9.2009
+    # The name of the container
+    container_name: centos7
+    #user: admin1
+    privileged: true
+    ports:
+      - "22:22"
+      - "5901:5901"
+      - "5902:5902"
+      
+    # The command to run inside the centos7 service container
+    entrypoint: ["/bin/bash","-c","exec usr/sbin/init",]
