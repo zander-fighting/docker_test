@@ -7,11 +7,14 @@ rootpassword="root"
 
 yum -y install sudo
 
-# add root password
+# add root password.
 echo "$rootpassword" | /opt/init/change_password.sh root root
 echo "$rootpassword" | /opt/init/user_add.sh admin1 admin1 sudo
 
 # Clear password
 unset rootpassword
+
+# install ssh server
+echo "" | /opt/init/ssh_install.sh
 
 su admin1
