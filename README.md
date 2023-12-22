@@ -5,7 +5,7 @@ This docker-compose.yaml is to build a test environment for centos7 convenient.
 Download the docker-compose.yaml file and run the command
 ```bash
 docker compose up
-exec -it centos7 /bin/bash
+docker exec -it centos7 /bin/bash
 cd /opt
 mkdir init
 cd init
