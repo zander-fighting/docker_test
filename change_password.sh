@@ -54,10 +54,6 @@ fi
 echo "$pass" | passwd --stdin "$user"
 check_error "Failed to change password for user $user"
 
-# Use the chage command to force the user to change the password at next login
-chage -d 0 "$user"
-check_error "Failed to set password expiry for user $user"
-
 # Print out information on successful password change
 print_info "Password change successful"
 print_info "username: $user"
