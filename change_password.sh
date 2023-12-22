@@ -1,42 +1,64 @@
 #!/bin/bash
 # This script is for change the user password on CentOS 7
-# Usage: ./change_password.sh user [password]
-# default setting [user=$USER] [password=$USER]
+# Usage: sudo ./change_password.sh username [password=username]
 
-# Get the number of input parameters
-num=$#
-# If there are no parameters, use the current user's username and password
-if [ $num -eq 1 ]; then
-  user=$1
-  pass=$1
-# If there are two parameters, use the first parameter as the username and the second parameter as the password
-elif [ $num -eq 2 ]; then
-  user=$1
-  pass=$2
-# If the number of parameters is illegal, prompt usage and exit
-else
-  echo -e "Script input error, correct input method is as follows:\n\
-$0 username [password]"
+# Define some constants
+SUDOERS_FILE="/etc/sudoers"
+SHELL="/bin/bash"
+
+# Define some functions
+check_error() {
+  # Check the last command result, if not 0, output the error message and exit the script
+  if [ $? -ne 0 ]; then
+    printf "[ERROR]%s\n" "$1"
+    exit 1
+  fi
+}
+
+print_info() {
+  # Print the information message with a prefix
+  printf "[INFO] %s\n" "$1"
+}
+
+change_permission() {
+  # Change the permission of the sudoers file, and check the result
+  chmod "$1" "$SUDOERS_FILE"
+  check_error "Failed to change the permission of $SUDOERS_FILE"
+}
+
+# Check if the script is run as root, if not, prompt the user to use sudo
+if [ $EUID -ne 0 ]; then
+  print_info "Please run this script as root or use sudo"
   exit 1
 fi
 
-# Check if the entered username exists.
-if ! id $user &> /dev/null; then
-  echo "$user not found, please add user"
+# Check if the first argument is supplied, if not, output the usage and exit
+if [[ -z $1 ]]; then
+  printf "[ERROR]No user name supplied\n"
+  print_info "Usage: $0 username [password=username]"
+  exit 1
 fi
 
-# Prompt the user to enter the sudo password
-echo "Please enter your sudo password:"
-read -s password
+# Get input parameters
+user="${1}"
+pass="${2:-$user}"
 
-# Use the echo command and pipeline to pass the password to the passwd command, and use the -- stdin option to have the passwd command read the new password from standard input
-# Add sudo command before echo and passwd
-echo $password | sudo -S passwd --stdin $user
-# Determine the result of password modification. If successful, display the password modification as successful. If unsuccessful, display the password modification as failed
-if [ $? -eq 0 ]; then
-  echo -e "\
-  Password modification successful\n\
-  user $user is added and the password is $pass"
-else
-  echo "Password modification failed"
+# Check if the entered username exists, if not, create the user
+if ! id "$user" &> /dev/null; then
+  print_info "User $user not found, creating user"
+  useradd -d "/home/$user" -s "$SHELL" "$user"
+  check_error "Failed to create user $user"
 fi
+
+# Use the echo command and pipeline to pass the password to the passwd command, and use the --stdin option to have the passwd command read the new password from standard input
+echo "$pass" | passwd --stdin "$user"
+check_error "Failed to change password for user $user"
+
+# Use the chage command to force the user to change the password at next login
+chage -d 0 "$user"
+check_error "Failed to set password expiry for user $user"
+
+# Print out information on successful password change
+print_info "Password change successful"
+print_info "username: $user"
+print_info "password: $pass"

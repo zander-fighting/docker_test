@@ -2,37 +2,43 @@
 # This script is for installing gnome desktop on CentOS 7
 # Usage: ./gnome_install.sh
 
-# Prompt the user to enter the sudo password
-get_sudo_password(){
-  echo "Please enter your sudo password:"
-  read -s password
+# Define some functions
+check_error() {
+  # Check the last command result, if not 0, output the error message and exit the script
+  if [ $? -ne 0 ]; then
+    printf "[ERROR]%s\n" "$1"
+    exit 1
+  fi
 }
+
+print_info() {
+  # Print the information message with a prefix
+  printf "[INFO] %s\n" "$1"
+}
+
+# Check if the script is run as root, if not, prompt the user to use sudo
+if [ $EUID -ne 0 ]; then
+  print_info "Please run this script as root or use sudo"
+  exit 1
+fi
 
 # Define a function to install GNOME Desktop and Graphical Administration Tools
-install_gnome() {
-  echo "Installing GNOME Desktop..."
-  echo $password | sudo -S yum -y groupinstall "GNOME Desktop"
-  # Set the default target to graphical.target
-  echo $password | sudo -S systemctl set-default graphical.target
-}
+print_info "Installing GNOME Desktop..."
+yum -y groupinstall "GNOME Desktop"
+check_error "file to install GNOME Desktop"
+# Set the default target to graphical.target
+systemctl set-default graphical.target
+check_error "file to Set the default target to graphical.target"
 
-# Define a function to print a success message
-print_success() {
-  # Use printf command to format the output
-  printf "GNOME Deskpot is installed"
-}
+# Use printf command to format the output
+print_info "GNOME Deskpot is installed"
 
 # Define a function to clean up on exit
 cleanup() {
-  echo "Cleaning up..."
+  print_info "Cleaning up..."
   # Add any commands to clean up here
   yum clean all
 }
 
 # Trap the exit signal and call the cleanup function
 trap cleanup EXIT
-
-# Call the functions
-get_sudo_password
-install_gnome
-print_success

@@ -17,6 +17,7 @@ docker cp .\change_password.sh centos7:/opt/init/change_password.sh
 docker cp .\user_add.sh centos7:/opt/init/user_add.sh
 docker cp .\ssh_install.sh centos7:/opt/init/ssh_install.sh
 docker cp .\gnome_install.sh centos7:/opt/init/gnome_install.sh
+docker cp .\test.sh centos7:/opt/init/test.sh
 ```
 in the container. use command to get start the project to test
 ```bash
