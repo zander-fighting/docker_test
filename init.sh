@@ -14,7 +14,9 @@ echo "$rootpassword" | /opt/init/user_add.sh admin1 admin1 sudo
 # Clear password
 unset rootpassword
 
+# change user
+su admin1
+
 # install ssh server
 echo "" | /opt/init/ssh_install.sh
-
-su admin1
+echo "" | /opt/init/gnome_install.sh
