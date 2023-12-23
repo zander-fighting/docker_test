@@ -27,31 +27,49 @@ if [ $EUID -ne 0 ]; then
   exit 1
 fi
 
-# Install net-tools
-yum -y install net-tools
-check_error "Failed to install net-tools"
+# Define a function to install VNC packages
+install_packages() {
+  # Use an array to store package names
+  local packages=(net-tools openssh-server openssh-clients)
+  # Loop through the array and install each package
+  for package in "${packages[@]}"; do
+    print_info "Installing $package..."
+    yum -y install "$package"
+    check_error "Failed to install $package"
+    print_info "Installing $package successful..."
+  done
+}
 
-# Install openssh-server and openssh-clients
-yum -y install openssh-server openssh-clients
-check_error "Failed to install openssh-server and openssh-clients"
+# Define a function to start and enable sshd service
+start_sshd() {
+  print_info "Starting and enabling sshd service..."
 
-# Start and enable sshd service
-systemctl start sshd
-check_error "Failed to start sshd service"
-systemctl enable sshd
-check_error "Failed to enable sshd service"
+  # Start and enable sshd service
+  systemctl start sshd
+  check_error "Failed to start sshd service"
+  print_info "Start sshd service..."
+  systemctl enable sshd
+  check_error "Failed to enable sshd service"
+  print_info "Enable sshd service..."
+}
 
-# Restart sshd service to apply the changes
-systemctl restart sshd
-check_error "Failed to restart sshd service"
+# Define a function to stop firewall service if active
+stop_firewall() {
+  print_info "Checking firewall status..."
+  # Use if-then-else to handle different cases
+  if systemctl is-active --quiet "$FIREWALL_SERVICE"; then
+    print_info "Stopping firewall service..."
+    systemctl stop "$FIREWALL_SERVICE"
+    check_error "Failed to stop firewall service"
+  else
+    print_info "The firewall service is already inactive"
+  fi
+}
 
-# Check if the firewall service is active
-if systemctl is-active --quiet "$FIREWALL_SERVICE"; then
-  systemctl stop "$FIREWALL_SERVICE"
-else
-  echo "The firewall has been turned off..."
-fi
-check_error "Failed to stop firewall"
+print_successful(){
+  # Print successful message
+  print_info "SSH installation and configuration completed successfully"
+}
 
 # Define a function to clean up on exit
 cleanup() {
@@ -63,4 +81,8 @@ cleanup() {
 # Trap the exit signal and call the cleanup function
 trap cleanup EXIT
 
-print_info "SSH installation and configuration completed successfully"
+# Call the functions
+install_packages
+start_sshd
+stop_firewall
+print_successful

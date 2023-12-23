@@ -6,6 +6,10 @@
 SUDOERS_FILE="/etc/sudoers"
 SHELL="/bin/bash"
 
+# Get input parameters
+user="${1}"
+pass="${2:-$user}"
+
 # Define some functions
 check_error() {
   # Check the last command result, if not 0, output the error message and exit the script
@@ -26,35 +30,44 @@ change_permission() {
   check_error "Failed to change the permission of $SUDOERS_FILE"
 }
 
-# Check if the script is run as root, if not, prompt the user to use sudo
-if [ $EUID -ne 0 ]; then
-  print_info "Please run this script as root or use sudo"
-  exit 1
-fi
+check_input(){
+  # Check if the script is run as root, if not, prompt the user to use sudo
+  if [ $EUID -ne 0 ]; then
+    print_info "Please run this script as root or use sudo"
+    exit 1
+  fi
 
-# Check if the first argument is supplied, if not, output the usage and exit
-if [[ -z $1 ]]; then
-  printf "[ERROR]No user name supplied\n"
-  print_info "Usage: $0 username [password=username]"
-  exit 1
-fi
+  # Check if the first argument is supplied, if not, output the usage and exit
+  if [[ -z $1 ]]; then
+    printf "[ERROR]No user name supplied\n"
+    print_info "Usage: $0 username [password=username]"
+    exit 1
+  fi
 
-# Get input parameters
-user="${1}"
-pass="${2:-$user}"
+  # Check if the entered username exists, if not, create the user
+  if ! id "$user" &> /dev/null; then
+    print_info "User $user not found, creating user"
+    useradd -d "/home/$user" -s "$SHELL" "$user"
+    check_error "Failed to create user $user"
+    print_info "User $user has been creating now"
+  fi
+}
 
-# Check if the entered username exists, if not, create the user
-if ! id "$user" &> /dev/null; then
-  print_info "User $user not found, creating user"
-  useradd -d "/home/$user" -s "$SHELL" "$user"
-  check_error "Failed to create user $user"
-fi
+change_password(){
+  # Use the echo command and pipeline to pass the password to the passwd command, and use the --stdin option to have the passwd command read the new password from standard input
+  echo "$pass" | passwd --stdin "$user"
+  check_error "Failed to change password for user $user"
+  print_info "Change $user password successfully"
+}
 
-# Use the echo command and pipeline to pass the password to the passwd command, and use the --stdin option to have the passwd command read the new password from standard input
-echo "$pass" | passwd --stdin "$user"
-check_error "Failed to change password for user $user"
+print_information(){
+  # Print out information on successful password change
+  print_info "Password change successful"
+  print_info "username: $user"
+  print_info "password: $pass"
+}
 
-# Print out information on successful password change
-print_info "Password change successful"
-print_info "username: $user"
-print_info "password: $pass"
+# Call the functions
+check_input
+change_password
+print_information

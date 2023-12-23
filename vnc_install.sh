@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script is for installing VNC on CentOS 7
-# Usage: ./vnc_install.sh
+# Usage: sudo ./vnc_install.sh
 
 # Define some functions
 check_error() {
@@ -22,7 +22,7 @@ if [ $EUID -ne 0 ]; then
   exit 1
 fi
 
-# Define a function to install packages
+# Define a function to install VNC packages
 install_packages() {
   # Use an array to store package names
   local packages=(tigervnc-server tigervnc-server-module)
@@ -33,6 +33,11 @@ install_packages() {
     check_error "Failed to install $package"
     print_info "Installing $package successful..."
   done
+}
+
+print_successful(){
+  # Print out information on successful VNC server install
+  print_info "VNC server installation successfully"
 }
 
 # Define a function to clean up on exit
@@ -47,3 +52,4 @@ trap cleanup EXIT
 
 # Call the functions
 install_packages
+print_successful

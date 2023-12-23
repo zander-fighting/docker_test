@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script is used to complete the base environment on CentOS 7
-# Usage: ./init.sh
+# Usage: sudo ./init.sh
 
 # install sudo
 yum -y install sudo
@@ -19,6 +19,9 @@ yum -y install sudo
 
 # install gnome desktop
 /opt/init/gnome_install.sh
+
+# install VNC server
+/opt/init/vnc_install.sh
 
 # change user
 su admin1

@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script is for installing basic packages on CentOS 7
-# Usage: ./basic_packages_install.sh
+# Usage: sudo ./basic_packages_install.sh
 
 # Define some functions
 check_error() {
@@ -31,6 +31,7 @@ install_packages() {
     print_info "Installing $package..."
     yum -y install "$package"
     check_error "Failed to install $package"
+    print_info "Installing $package successful..."
   done
 }
 

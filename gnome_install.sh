@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script is for installing gnome desktop on CentOS 7
-# Usage: ./gnome_install.sh
+# Usage: sudo ./gnome_install.sh
 
 # Define some functions
 check_error() {
@@ -22,16 +22,26 @@ if [ $EUID -ne 0 ]; then
   exit 1
 fi
 
-# Define a function to install GNOME Desktop and Graphical Administration Tools
-print_info "Installing GNOME Desktop..."
-yum -y groupinstall "GNOME Desktop"
-check_error "file to install GNOME Desktop"
-# Set the default target to graphical.target
-systemctl set-default graphical.target
-check_error "file to Set the default target to graphical.target"
+install_packages(){
+  # Define a function to install GNOME Desktop and Graphical Administration Tools
+  print_info "Installing GNOME Desktop..."
+  yum -y groupinstall "GNOME Desktop"
+  check_error "file to install GNOME Desktop"
+  print_info "Installing GNOME Desktop successful..."
+}
 
-# Use printf command to format the output
-print_info "GNOME Deskpot is installed"
+set_default(){
+  # Set the default target to graphical.target
+  systemctl set-default graphical.target
+  check_error "file to Set the default target to graphical.target"
+  print_info "Set the default target to graphical.target successful..."
+}
+
+print_successful(){
+  # Print out information on successful
+  print_info "GNOME Deskpot is installed adn configure"
+}
+
 
 # Define a function to clean up on exit
 cleanup() {
@@ -42,3 +52,8 @@ cleanup() {
 
 # Trap the exit signal and call the cleanup function
 trap cleanup EXIT
+
+# Call the functions
+install_packages
+set_default
+print_successful
