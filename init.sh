@@ -11,6 +11,9 @@ yum -y install sudo
 # add user
 /opt/init/user_add.sh admin1 admin1 sudo
 
+# install basic packages
+/opt/init/basic_packages_install.sh
+
 # install ssh server
 /opt/init/ssh_install.sh
 
