@@ -32,13 +32,6 @@ if [ $EUID -ne 0 ]; then
   exit 1
 fi
 
-# Get input parameters
-user="$1"
-pass="$2"
-perm="${3:-normal}"
-
-# Check input parameters
-check_input(){
   # If the number of parameters is not three, output the standard command input method and exit
   if [ $# -ne 3 ]; then
     print_info "Script input error, correct input method is as follows:"
@@ -46,6 +39,13 @@ check_input(){
     exit 1
   fi
 
+# Get input parameters
+user="$1"
+pass="$2"
+perm="${3:-normal}"
+
+# Check input parameters
+check_input(){
   # Check the input user permissions. If it is not sudo or normal, output that the user permissions are illegal and exit
   if [ "$perm" != "sudo" ] && [ "$perm" != "normal" ]; then
     print_info "User permissions are illegal"

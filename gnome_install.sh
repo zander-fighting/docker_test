@@ -26,20 +26,20 @@ install_packages(){
   # Define a function to install GNOME Desktop and Graphical Administration Tools
   print_info "Installing GNOME Desktop..."
   yum -y groupinstall "GNOME Desktop"
-  check_error "file to install GNOME Desktop"
+  check_error "fail to install GNOME Desktop"
   print_info "Installing GNOME Desktop successful..."
 }
 
 set_default(){
   # Set the default target to graphical.target
   systemctl set-default graphical.target
-  check_error "file to Set the default target to graphical.target"
+  check_error "fail to Set the default target to graphical.target"
   print_info "Set the default target to graphical.target successful..."
 }
 
 print_successful(){
   # Print out information on successful
-  print_info "GNOME Deskpot is installed adn configure"
+  print_info "GNOME Deskpot is installed and configure"
 }
 
 

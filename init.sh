@@ -23,5 +23,8 @@ yum -y install sudo
 # install VNC server
 /opt/init/vnc_install.sh
 
+# creat vnc server
+/opt/init/vnc_user_add.sh admin1 admin1
+
 # change user
 su admin1

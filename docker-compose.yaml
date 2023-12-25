@@ -7,7 +7,7 @@ services:
     # The Docker image to use for the centos7 service
     image: centos:7.9.2009
     # The name of the container
-    container_name: centos7
+    container_name: centos7_test
     #user: admin1
     privileged: true
     ports:

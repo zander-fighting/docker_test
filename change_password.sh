@@ -1,14 +1,28 @@
 #!/bin/bash
 # This script is for change the user password on CentOS 7
-# Usage: sudo ./change_password.sh username [password=username]
+# Usage: sudo ./change_password.sh username password
 
 # Define some constants
 SUDOERS_FILE="/etc/sudoers"
 SHELL="/bin/bash"
 
+# Check if the first argument is supplied, if not, output the usage and exit
+if [[ -z $1 ]]; then
+  printf "[ERROR]No user name supplied\n"
+  print_info "Usage: $0 username password"
+  exit 2
+fi
+
+# Check if the second argument is supplied, if not, output the usage and exit
+if [[ -z $2 ]]; then
+  printf "[ERROR]No user passowrd supplied\n"
+  print_info "Usage: $0 username password"
+  exit 3
+fi
+
 # Get input parameters
 user="${1}"
-pass="${2:-$user}"
+pass="${2}"
 
 # Define some functions
 check_error() {
@@ -34,13 +48,6 @@ check_input(){
   # Check if the script is run as root, if not, prompt the user to use sudo
   if [ $EUID -ne 0 ]; then
     print_info "Please run this script as root or use sudo"
-    exit 1
-  fi
-
-  # Check if the first argument is supplied, if not, output the usage and exit
-  if [[ -z $1 ]]; then
-    printf "[ERROR]No user name supplied\n"
-    print_info "Usage: $0 username [password=username]"
     exit 1
   fi
 

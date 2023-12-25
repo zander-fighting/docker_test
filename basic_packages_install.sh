@@ -25,7 +25,7 @@ fi
 # Define a function to install packages
 install_packages() {
   # Use an array to store package names
-  local packages=(epel-release vim net-tools)
+  local packages=(epel-release vim net-tools tcl-devel expect)
   # Loop through the array and install each package
   for package in "${packages[@]}"; do
     print_info "Installing $package..."
